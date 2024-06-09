@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="$style['item-cells-container']">
+  <div ref="container" :class="$style['item-cells-container']">
     <div
       v-for="(item, index) in filteredItems"
       :key="Math.floor(Math.random() * Date.now())"
@@ -38,17 +38,9 @@ import { useCategoriesFilter } from '../composables/useCategoriesFilter';
 
 const itemsInfo = ref<Item[]>([])
 const tooltip = ref<HTMLElement>()
-const baseSize = ref()
+const container = ref<HTMLElement>()
 
 const { selectedType } = useCategoriesFilter()
-
-const cell = computed(() => {
-  return document.getElementsByClassName('item')[0]
-})
-
-const cellsContainer = computed(() => {
-  return document.getElementsByClassName('container')[0]
-})
 
 const filteredItems = computed(() => {
   let filter
@@ -69,11 +61,11 @@ const filteredItems = computed(() => {
   }
 })
 
-const resizeObserver = new ResizeObserver((entry) => {
-  (cellsContainer.value as HTMLElement).style.maxHeight = (Math.floor(entry[0].borderBoxSize[0].blockSize) || baseSize.value) * 8 + 10 + 'px'
-  
-  baseSize.value = cellsContainer.value.clientHeight
-})
+function setInventoryHeight() {
+  if (container.value) {
+    container.value.style.maxHeight = (container.value.children[0] as HTMLElement).offsetHeight * 8 + 10 + 'px'
+  }
+}
 
 async function showTooltip(tooltipIndex: number,evt: MouseEvent) {
   await nextTick()
@@ -102,15 +94,13 @@ onMounted(async() => {
     console.log('Error', e)
   } finally {
     await nextTick()
-    resizeObserver.observe(cell.value)
-
-    console.log('h', cellsContainer.value.clientHeight)
+    setInventoryHeight()
+    window.addEventListener('resize', setInventoryHeight)
   }
 })
 
 onBeforeUnmount(() => {
-  resizeObserver.unobserve(cell.value)
-  
+  window.removeEventListener('resize', setInventoryHeight)
 })
 
 </script>
