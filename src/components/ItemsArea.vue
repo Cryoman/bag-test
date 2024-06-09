@@ -26,6 +26,7 @@
         <img src="/src/assets/triangle.png" alt="">
       </div>
       <div class="tooltip" :class="$style['item-tooltip']">{{ item.name }}</div>
+      <div :class="$style['item-cover']" />
     </div>
   </div>
 </template>
@@ -69,7 +70,7 @@ const filteredItems = computed(() => {
 })
 
 const resizeObserver = new ResizeObserver((entry) => {
-  (cellsContainer.value as HTMLElement).style.maxHeight = (Math.floor(entry[0].borderBoxSize[0].blockSize) || baseSize.value) * 8 + 'px'
+  (cellsContainer.value as HTMLElement).style.maxHeight = (Math.floor(entry[0].borderBoxSize[0].blockSize) || baseSize.value) * 8 + 10 + 'px'
   
   baseSize.value = cellsContainer.value.clientHeight
 })
@@ -131,6 +132,7 @@ onBeforeUnmount(() => {
   margin-block: 12px;
   width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -241,5 +243,11 @@ onBeforeUnmount(() => {
   z-index: 5;
   color: white;
   width: fit-content;
+}
+
+.item-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
 }
 </style>
